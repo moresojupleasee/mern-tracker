@@ -1,22 +1,46 @@
-const express = requrie('express')
-const cors = require('cors')
-const mongoose = reqire('mongoose')
-
-require('dotenv').config();
-
+const express = require('express');
 const app = express();
-const port = 2000
+const mongoose = require('mongoose')
 
-app.use(cors());
-app.use(express.json());
 
-const uri = process.env.ATLAS_URI;
-mongoose.connect(uri, {});
-const connection = mongoose.connection
-connection.once('open',() =>{          
-    console.log("MongoDB dabtabase connection established successfully")
+require('dotenv').config({path:'.myenv'}); 
+const uri = process.env.dbatlas;
+
+app.post('/anime',async(req,res)=>{
+    try{
+        const anime = await anime.create(req.body)
+        res.status(200).json(anime);
+    }catch(error){
+        console.log(error.message);
+        res.status(500).json({message:error.message})
+    }
 })
 
-app.listen(port,() => {
-    console.log(`server is running on port: ${port}`);
+app.get('/', (req, res) => {
+    res.send('Hellow');
+});
+
+const Deployment = require('./models/deployment')
+console.log('oi')
+app.get('/deployments', async(req, res) => {
+    try {
+        const deployment = await Deployment.find({});
+        res.status(200).json(deployment)
+    } catch(error) {
+        res.status(500).json({message: res.message})
+    }
+})
+
+// Db connection { with uri stored im dotenv }
+mongoose
+    .connect(uri,{useNewUrlParser:true,useUnifiedTopology :true})
+    .then(() => {
+        console.log("Connected to MongoDB")
+    })
+    .catch((error) =>{
+        console.log(error);
+    });
+   
+app.listen(3000, () =>{
+    console.log('Server listening on port');
 });
